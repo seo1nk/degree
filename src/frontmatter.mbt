@@ -2,7 +2,7 @@
 /// フロントマターのパース。
 ///
 /// ブロック先頭の `---` 行から次の `---` 行までを YAML 風のフィールド列として解釈する。
-/// フィールドは `key` / `bpm` / `time`。
+/// フィールドは `key` / `bpm` / `time` / `credit`(v1.9)。
 /// 返り値: (メタデータ, エラー列, 本文の開始行インデックス)
 
 ///|
@@ -36,6 +36,7 @@ fn parse_frontmatter(
   let mut key : String? = None
   let mut bpm : Int? = None
   let mut time : String? = None
+  let mut credit : String? = None
   for idx in 1..<close_idx {
     let line = lines[idx].trim().to_owned()
     let line_no = idx + 1
@@ -69,6 +70,9 @@ fn parse_frontmatter(
           } else {
             errors.push(invalid_time_signature_error(value, line_no))
           }
+        } else if name == "credit" {
+          // 値は自由な文字列(コロンを含んでよい)。空なら書かなかったのと同じ
+          credit = if value.is_empty() { None } else { Some(value) }
         } else {
           errors.push(invalid_frontmatter_field_error(name, line_no))
         }
@@ -76,7 +80,7 @@ fn parse_frontmatter(
       None => errors.push(invalid_frontmatter_field_error(line, line_no))
     }
   }
-  (Some({ key, bpm, time }), errors, close_idx + 1)
+  (Some({ key, bpm, time, credit }), errors, close_idx + 1)
 }
 
 ///|

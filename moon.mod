@@ -1,6 +1,6 @@
 name = "seo1nk/chord_language"
 
-version = "1.8.0"
+version = "1.9.0"
 
 readme = "README.mbt.md"
 

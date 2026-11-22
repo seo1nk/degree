@@ -204,6 +204,7 @@ pub fn chord_css() -> String {
     #|.chord-cheat-head { grid-column: 1 / -1; font-weight: 700; font-size: 0.92em; opacity: 0.75; margin-top: 0.3em; }
     #|.chord-cheat-head:first-child { margin-top: 0; }
     #|.chord-cheat-example { grid-column: 1 / -1; margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.95em; border: 1px solid #8886; border-radius: 6px; padding: 0.5em 0.8em; background: #8881; user-select: all; }
+    #|.chord-credit { grid-column: 1 / -1; justify-self: end; max-width: 100%; margin-top: -0.4em; font-size: 0.72em; line-height: 1.6; opacity: 0.62; text-align: right; overflow-wrap: anywhere; } /* 出典(フロントマターの credit)。右寄せの薄い文字 */
     #|.chord-cell--playing { background: #8888883d; border-radius: 5px; }
     #|.chord-mod--playing { background: #8888883d; opacity: 1; } /* 再生カーソルが転調をまたいだ瞬間の点灯(ランタイムが付与) */
     #|.chord-prevkey { font-size: 0.6em; font-weight: 500; opacity: 0.45; margin-left: 0.3em; letter-spacing: 0; } /* 転調直後の小節に添える転調前ディグリー(=V) */
@@ -273,6 +274,7 @@ pub fn chord_cheatsheet_html() -> String {
     #|<code>[bpm: 140] [time: 3/4]</code><span>テンポ・拍子の変更（単独行でもコード行の途中でも）。次に書いたコードから効く</span>
     #|<code>&gt; ひかりの _ _-さきへ</code><span>直前のコード行への歌詞。空白と | = 区切り、_ 単独 = 歌詞なし、断片中の _ = スペース、- = 拍分割（_-さきへ で後半から）</span>
     #|<code>key: Eb / bpm: 96 / time: 6/8</code><span>フロントマター（先頭に --- で囲んで書く。省略時 C・120・4/4）。キーを宣言すると冒頭にキーチップが出る</span>
+    #|<code>credit: 「曲名」作詞:… 作曲:… より</code><span>出典（フロントマターに書く）。譜面の右下に小さく出る</span>
     #|<code>key: Am</code><span>短調は末尾に m。数字は長調と同じく主音から数える（Am F G = 1m b6 b7）</span>
     #|<code>:2m7:</code><span>インラインコード譜（:::chord ブロックの外の本文中に 1 コード。ディグリー表示のみ）</span>
     #|<div class="chord-cheat-head">例: 2-5-1（コピーして試してみてください）</div>

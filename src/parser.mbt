@@ -577,6 +577,10 @@ pub fn ScoreAST::to_json_value(self : ScoreAST) -> Json {
         Some(t) => m["time"] = Json::string(t)
         None => ()
       }
+      match meta.credit {
+        Some(c) => m["credit"] = Json::string(c)
+        None => ()
+      }
       obj["meta"] = Json::object(m)
     }
     None => ()

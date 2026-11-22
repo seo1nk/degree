@@ -232,6 +232,7 @@ pub struct ScoreMeta {
   key : String?
   bpm : Int?
   time : String?
+  credit : String?
 }
 
 pub struct SectionLabel {

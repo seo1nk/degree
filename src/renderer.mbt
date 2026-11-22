@@ -693,8 +693,20 @@ fn render_score_html(
     write_section_html(sb, ast.sections[si])
     si = si + 1
   }
+  write_credit_html(sb, ast)
   sb.write_string("</div>")
   sb.to_string()
+}
+
+///|
+/// 出典(フロントマターの credit)を譜面の右下に置く。.chord-score の中に置くので、
+/// ディグリー・コードの両タブと、画像コピー(PNG)にも出る
+fn write_credit_html(sb : StringBuilder, ast : ScoreAST) -> Unit {
+  match ast.meta {
+    Some({ credit: Some(c), .. }) =>
+      sb.write_string("<div class=\"chord-credit\">" + escape_html(c) + "</div>")
+    _ => ()
+  }
 }
 
 ///|
