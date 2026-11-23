@@ -89,8 +89,8 @@ pub fn render_widget_html(input : String) -> String {
   sb.write_string(
     "<button type=\"button\" class=\"chord-tab\" data-chord-tab=\"notes\">コード</button>",
   )
-  // 右側ツール: 2×2 グリッド(上段 = ♭/♯トグル・キープルダウンの
-  // キー系、下段 = 再生・画像コピー)。行の高さを共有するので横の
+  // 右側ツール: 3 列のグリッド(上段 = ♭/♯トグル(2 列ぶん)・キープルダウンの
+  // キー系、下段 = ループ・再生・画像コピー)。行の高さを共有するので横の
   // ラインが揃う。キー系はコードタブ専用で、ディグリータブでは
   // visibility で場所だけ保持する(下段の位置とバーの高さは両タブで不変)
   sb.write_string("<div class=\"chord-tools\">")
@@ -121,6 +121,13 @@ pub fn render_widget_html(input : String) -> String {
     )
   }
   sb.write_string("</select>")
+  // ループ再生のスイッチ(v1.10)。オンのまま最後まで鳴らすと、始めた位置へ戻って続ける。
+  // 切り替えと繰り返しはクライアントランタイム(フォーク側 chord-widget.ts)
+  sb.write_string(
+    "<button type=\"button\" class=\"chord-loop\" aria-pressed=\"false\" title=\"ループ再生\" aria-label=\"ループ再生\">" +
+    loop_icon_svg +
+    "</button>",
+  )
   sb.write_string(
     "<button type=\"button\" class=\"chord-play\" title=\"表示中のキーで再生\" aria-label=\"再生\">" +
     play_icon_svg +
@@ -186,18 +193,20 @@ pub fn chord_css() -> String {
     #|.chord-error-src { margin: 0; opacity: 0.75; white-space: pre-wrap; font-size: 0.9em; }
     #|.chord-widget { margin: 0.75em 0; border-bottom: 1.5px solid #88888866; padding-bottom: 0.6em; }
     #|.chord-tabs { display: flex; align-items: flex-end; gap: 0.3em; border-bottom: 1.5px solid #88888866; padding: 0 0.5em; flex-wrap: wrap; row-gap: 0.25em; }
-    #|.chord-tab, .chord-key-select, .chord-spell, .chord-copy-img, .chord-play { white-space: nowrap; }
+    #|.chord-tab, .chord-key-select, .chord-spell, .chord-copy-img, .chord-play, .chord-loop { white-space: nowrap; }
+    #|.chord-spell { grid-column: span 2; } /* 上段: 綴り(2 列ぶん)・キー / 下段: ループ・再生・画像コピー */
     #|.chord-tab { font: inherit; font-size: 0.78em; padding: 0.3em 1.1em; border: 1.5px solid transparent; border-bottom: none; border-radius: 8px 8px 0 0; background: transparent; color: inherit; cursor: pointer; opacity: 0.6; margin-bottom: 0; }
     #|.chord-tab--active { opacity: 1; font-weight: 600; border-color: #88888866; background: var(--chord-bg); margin-bottom: -1.5px; }
-    #|.chord-tools { display: grid; grid-template-columns: max-content max-content; gap: 0.3em 0.45em; align-items: stretch; justify-items: stretch; margin-left: auto; align-self: center; margin-bottom: 0.25em; }
+    #|.chord-tools { display: grid; grid-template-columns: max-content max-content max-content; gap: 0.3em 0.45em; align-items: stretch; justify-items: stretch; margin-left: auto; align-self: center; margin-bottom: 0.25em; }
     #|.chord-key-select { font: inherit; font-size: 0.78em; background: transparent; color: inherit; border: 1px solid #8886; border-radius: 4px; padding: 0.05em 0.3em; }
     #|.chord-spell { display: flex; align-items: stretch; border: 1px solid #8886; border-radius: 4px; overflow: hidden; }
     #|.chord-spell-opt { font: inherit; font-size: 0.78em; flex: 1 1 0; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: inherit; border: none; padding: 0.05em 0.4em; cursor: pointer; opacity: 0.5; }
     #|.chord-spell-opt:hover { opacity: 0.85; }
     #|.chord-spell-opt[aria-pressed="true"] { background: #8883; opacity: 1; font-weight: 600; }
-    #|.chord-copy-img, .chord-play { font: inherit; font-size: 0.72em; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: inherit; border: 1px solid #8886; border-radius: 4px; padding: 0.1em 0.6em; cursor: pointer; opacity: 0.75; }
-    #|.chord-play svg, .chord-copy-img svg { vertical-align: -0.3em; }
-    #|.chord-copy-img:hover, .chord-play:hover { opacity: 1; }
+    #|.chord-copy-img, .chord-play, .chord-loop { font: inherit; font-size: 0.72em; display: inline-flex; align-items: center; justify-content: center; background: transparent; color: inherit; border: 1px solid #8886; border-radius: 4px; padding: 0.1em 0.6em; cursor: pointer; opacity: 0.75; }
+    #|.chord-play svg, .chord-copy-img svg, .chord-loop svg { vertical-align: -0.3em; }
+    #|.chord-copy-img:hover, .chord-play:hover, .chord-loop:hover { opacity: 1; }
+    #|.chord-loop[aria-pressed="true"] { opacity: 1; background: #8883; border-color: currentColor; } /* ループがオン */
     #|.chord-cheatsheet { display: grid; font-size: 0.78em; grid-template-columns: max-content 1fr; column-gap: 1.1em; row-gap: 0.28em; align-items: baseline; }
     #|.chord-cheatsheet code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.95em; white-space: nowrap; }
     #|.chord-cheatsheet span { opacity: 0.85; }
@@ -230,6 +239,12 @@ fn icon_svg(name : String, body : String) -> String {
 /// 再生ボタンのアイコン(lucide: play)
 let play_icon_svg : String = icon_svg(
   "play", "<polygon points=\"6 3 20 12 6 21 6 3\"/>",
+)
+
+///|
+/// ループ再生のスイッチのアイコン(lucide: repeat)
+let loop_icon_svg : String = icon_svg(
+  "repeat", "<path d=\"m17 2 4 4-4 4\"/><path d=\"M3 11v-1a4 4 0 0 1 4-4h14\"/><path d=\"m7 22-4-4 4-4\"/><path d=\"M21 13v1a4 4 0 0 1-4 4H3\"/>",
 )
 
 ///|
