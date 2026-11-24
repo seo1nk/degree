@@ -121,7 +121,7 @@ pub fn render_widget_html(input : String) -> String {
     )
   }
   sb.write_string("</select>")
-  // ループ再生のスイッチ(v1.10)。オンのまま最後まで鳴らすと、始めた位置へ戻って続ける。
+  // ループ再生のスイッチ(v1.10)。オンのまま最後まで鳴らすと、曲の頭へ戻って続ける。
   // 切り替えと繰り返しはクライアントランタイム(フォーク側 chord-widget.ts)
   sb.write_string(
     "<button type=\"button\" class=\"chord-loop\" aria-pressed=\"false\" title=\"ループ再生\" aria-label=\"ループ再生\">" +
